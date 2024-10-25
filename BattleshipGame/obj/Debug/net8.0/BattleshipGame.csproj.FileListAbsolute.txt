@@ -12,3 +12,4 @@ C:\mittuniversitetet\csharpdotnet\moment5_projekt\BattleshipGame\obj\Debug\net8.
 C:\mittuniversitetet\csharpdotnet\moment5_projekt\BattleshipGame\obj\Debug\net8.0\BattleshipGame.pdb
 C:\mittuniversitetet\csharpdotnet\moment5_projekt\BattleshipGame\obj\Debug\net8.0\BattleshipGame.genruntimeconfig.cache
 C:\mittuniversitetet\csharpdotnet\moment5_projekt\BattleshipGame\obj\Debug\net8.0\ref\BattleshipGame.dll
+C:\mittuniversitetet\csharpdotnet\moment5_projekt\BattleshipGame\obj\Debug\net8.0\BattleshipGame.sourcelink.json
