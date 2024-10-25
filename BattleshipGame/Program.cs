@@ -3,7 +3,7 @@ Spelet "Sänka skepp" eller "Battleship" med C#.NET */
 
 using System;
 
-namespace Battleship
+namespace BattleshipGame
 {
     class Program
     {
