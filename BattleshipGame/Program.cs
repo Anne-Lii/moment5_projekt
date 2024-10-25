@@ -11,14 +11,20 @@ namespace BattleshipGame
         {
             //skapar ett 10x10 rutnät
             char[,] grid = new char[10, 10];
+            InitializeGrid(grid);//Anropar
 
-            //fyller spelplanen med symboler som representerar vatten
-            for (int row = 0; row < 10; row++)
+            // Skapa och placera skepp
+            Ship[] ships = {
+                new Ship.Carrier(),
+                new Ship.Battleship(),
+                new Ship.Submarine(),
+                new Ship.Destroyer()
+            };
+
+            // Placera alla skepp
+            foreach (var ship in ships)
             {
-                for (int col = 0; col < 10; col++)
-                {
-                    grid[row,col] = '~'; //representerar vågor
-                }
+                ship.PlaceShip(grid);
             }
 
             //Anropar metoden PrintGrid för att visa rutnätet i konsollen
@@ -38,6 +44,20 @@ namespace BattleshipGame
                     Console.Write(grid[row, col] + " ");
                 }
                 Console.WriteLine();//tom rad
+            }
+        }
+
+        //Metod för att initialisera spelplanen med vatten
+        static void InitializeGrid(char[,] grid)
+        {
+            
+            //fyller spelplanen med symboler som representerar vatten
+            for (int row = 0; row < 10; row++)
+            {
+                for (int col = 0; col < 10; col++)
+                {
+                    grid[row,col] = '~'; //representerar vågor
+                }
             }
         }
     }
