@@ -83,7 +83,7 @@ namespace BattleshipGame
         }
 
         // Hjälpmetoder för inmatning av koordinater och riktning
-        private int GetValidCoordinate(string prompt, int min, int max)
+        public static int GetValidCoordinate(string prompt, int min, int max)
         {
             int coord;
             while (true)
