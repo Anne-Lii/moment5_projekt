@@ -3,6 +3,7 @@ Spelet "Sänka skepp" eller "Battleship" med C#.NET */
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;  // Tillägg för Stopwatch
 
 namespace BattleshipGame
 {
@@ -13,7 +14,11 @@ namespace BattleshipGame
 
         static void Main(string[] args)
         {
-            //skapar ett 10x10 rutnät var
+
+            // Skapar en Stopwatch-instans
+            Stopwatch stopwatch = new Stopwatch();
+
+            //skapar ett 10x10 rutnät/spelplan var
             char[,] playerGrid = new char[10, 10];
             char[,] computerGrid = new char[10, 10];
 
@@ -55,14 +60,20 @@ namespace BattleshipGame
 
             Console.WriteLine("Alla skepp har placerats. Spelet börjar!\n");
 
+            // Startar klockan när spelet börjar
+            stopwatch.Start();
+            Console.WriteLine("Klockan har startats!\n");
+
             //starta spelloopen
             bool gameOn = true;
+
+
 
             while (gameOn)
             {
 
                 // Visa datorns spelplan innan spelaren skjuter
-                Console.WriteLine("Datorns spelplan (före ditt skott):\n");
+                Console.WriteLine("\nDatorns spelplan (före ditt skott):\n");
                 PrintComputerGrid(computerGrid);
 
 
@@ -72,7 +83,11 @@ namespace BattleshipGame
                 // Kolla om spelaren vann
                 if (AllShipsSunk(computerGrid))
                 {
+                    // Stoppar klockan vid vinst
+                    stopwatch.Stop();
+
                     Console.WriteLine("GRATTIS, du har sänkt alla skepp! Du vann!!!");
+                    Console.WriteLine($"Spelet varade i {stopwatch.Elapsed.Minutes} minuter och {stopwatch.Elapsed.Seconds} sekunder.");
                     PrintComputerGrid(computerGrid);
                     gameOn = false;
                     break;
@@ -96,7 +111,11 @@ namespace BattleshipGame
                 // Kolla om datorn vann
                 if (AllShipsSunk(playerGrid))
                 {
+                    // Stoppar klockan vid förlust
+                    stopwatch.Stop();
+
                     Console.WriteLine("Datorn sänkte alla dina skepp. Du förlorade.");
+                    Console.WriteLine($"Spelet varade i {stopwatch.Elapsed.Minutes} minuter och {stopwatch.Elapsed.Seconds} sekunder.");
                     gameOn = false;
                     break;
                 }
@@ -205,6 +224,8 @@ namespace BattleshipGame
 
                 if (int.TryParse(input, out int col) && col >= 0 && col <= 9)
                 {
+
+                    Console.Clear();//rensar konsollen
                     if (grid[row, col] == 'S')
                     {
                         Console.WriteLine("Du TRÄFFADE ett skepp!");
