@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace BattleshipGame
 {
@@ -6,6 +7,9 @@ namespace BattleshipGame
     {
         public int Length { get; private set; }
         public string Name { get; private set; }
+
+         // Lista för att hålla reda på alla skeppspositioner
+        public List<(int row, int col)> Positions { get; private set; } = new List<(int row, int col)>();
 
         public Ship(int length, string name)
         {
@@ -92,11 +96,14 @@ namespace BattleshipGame
 
         private void PlaceShipOnGrid(char[,] grid, int row, int col, char direction)
         {
+            Positions.Clear(); // Rensa gamla positioner
+
             if (direction == 'h')
             {
                 for (int i = 0; i < Length; i++)
                 {
                     grid[row, col + i] = 'S';
+                    Positions.Add((row, col + i)); // Sparar positionen
                 }
             }
             else if (direction == 'v')
@@ -104,8 +111,22 @@ namespace BattleshipGame
                 for (int i = 0; i < Length; i++)
                 {
                     grid[row + i, col] = 'S';
+                    Positions.Add((row + i, col)); // Sparar positionen
                 }
             }
+        }
+
+        // Kontrollera om skeppet har sjunkit
+        public bool IsSunk(char[,] grid)
+        {
+            foreach (var (row, col) in Positions)
+            {
+                if (grid[row, col] != 'X') // Om någon ruta fortfarande inte är träffad
+                {
+                    return false;
+                }
+            }
+            return true; // Alla rutor har blivit träffade
         }
 
         // Hjälpmetoder för inmatning av koordinater och riktning
