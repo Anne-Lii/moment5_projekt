@@ -17,9 +17,10 @@ namespace BattleshipGame
             char[,] playerGrid = new char[10, 10];
             char[,] computerGrid = new char[10, 10];
 
-            InitializeGrid(playerGrid);//Anropar
-            InitializeGrid(computerGrid);//Anropar
+            InitializeGrid(playerGrid);
+            InitializeGrid(computerGrid);
 
+            Console.WriteLine("Välkommen till SÄNKA SKEPP!\n");
 
             // Skapa och placera datorns skepp som är dolda för spelaren
             Ship[] computerShips = {
@@ -60,6 +61,11 @@ namespace BattleshipGame
             while (gameOn)
             {
 
+                // Visa datorns spelplan innan spelaren skjuter
+                Console.WriteLine("Datorns spelplan (före ditt skott):\n");
+                PrintComputerGrid(computerGrid);
+
+
                 Console.WriteLine("Din tur att skjuta");
                 PlayerShoot(computerGrid);
 
@@ -71,6 +77,10 @@ namespace BattleshipGame
                     break;
                 }
 
+                // Visar datorns spelplan efter att spelaren har skjutit
+                Console.WriteLine("\nDatorns spelplan:\n");
+                PrintComputerGrid(computerGrid);
+
                 // Paus för att låta spelaren se resultatet
                 Console.WriteLine("\nTryck på valfri tangent för att fortsätta...");
                 Console.ReadKey(); // Väntar på att spelaren trycker på en tangent
@@ -78,7 +88,7 @@ namespace BattleshipGame
                 // Rensa konsollen innan datorns tur börjar
                 Console.Clear();
 
-                // Datorn skjuter på spelarens grid
+                // Datorn skjuter på spelarens spelplan
                 Console.WriteLine("\nDatorns tur att skjuta.");//debug
                 ComputerShoot(playerGrid, playerShips);
                 Console.WriteLine("\nDatorn har skjutit.");//debug
@@ -91,8 +101,8 @@ namespace BattleshipGame
                     break;
                 }
 
-                // Skriv ut spelarens grid efter varje tur
-                Console.WriteLine("\nDitt rutnät:");
+                // Skriv ut spelarens spelplan efter varje tur
+                Console.WriteLine("\nDin spelplan:\n");
                 PrintGrid(playerGrid);
             }
 
@@ -112,7 +122,7 @@ namespace BattleshipGame
                 col = rnd.Next(0, 10);
 
                 // Kolla om platsen redan är skjuten
-                if (grid[row, col] == 'X' || grid[row, col] == 'O')
+                if (grid[row, col] == 'X' || grid[row, col] == 'O' || grid[row, col] == 'x')
                 {
                     // Om platsen redan har blivit skjuten, fortsätt försöka
                     continue;
@@ -121,16 +131,13 @@ namespace BattleshipGame
                 // Om vi når hit, betyder det att platsen inte är skjuten på
                 validShot = true;
 
-                // Debug: Visa vilken rad och kolumn datorn försöker skjuta på
-                Console.WriteLine($"Datorn skjuter på rad {row} och kolumn {col}...");
-
                 if (grid[row, col] == 'S') // Träffar skepp
                 {
                     Console.WriteLine($"Datorn träffade ett skepp på ({row}, {col})!");
-                    grid[row, col] = 'X'; // Markera träff
+                    grid[row, col] = 'x'; // Markera träff med ett litet 'x'
 
                     // Lägg till angränsande rutor för att skjuta på
-                    AddAdjacentTargets(row, col); // Lägg till angränsande mål i kön
+                    AddAdjacentTargets(row, col);
 
                     // Kontrollera om skeppet som träffades har sjunkit
                     foreach (var ship in playerShips)
@@ -138,6 +145,18 @@ namespace BattleshipGame
                         if (ship.Positions.Contains((row, col)) && ship.IsSunk(grid))
                         {
                             Console.WriteLine($"Datorn har sänkt ditt skepp: {ship.Name}!");
+
+                            // Ändra alla 'x' på detta skepp till 'X' för att visa att skeppet är sänkt
+                            foreach (var position in ship.Positions)
+                            {
+                                int shipRow = position.Item1;
+                                int shipCol = position.Item2;
+
+                                if (grid[shipRow, shipCol] == 'x') // Om det är en träff som ännu inte markerats som sänkt
+                                {
+                                    grid[shipRow, shipCol] = 'X'; // Ändra till stort 'X'
+                                }
+                            }
                             break;
                         }
                     }
@@ -182,12 +201,12 @@ namespace BattleshipGame
                 {
                     if (grid[row, col] == 'S')
                     {
-                        Console.WriteLine("Du träffade ett skepp!");
+                        Console.WriteLine("Du TRÄFFADE ett skepp!");
                         grid[row, col] = 'X'; // Markera träff
                     }
                     else
                     {
-                        Console.WriteLine("Du missade.");
+                        Console.WriteLine("Du MISSADE.");
                         grid[row, col] = 'O'; // Markera miss
                     }
                 }
@@ -215,7 +234,7 @@ namespace BattleshipGame
             return true;
         }
 
-        //Metod för att skriva ut rutnätet till konsollen
+        //Metod för att skriva ut spelplanen till konsollen
         static void PrintGrid(char[,] grid)
         {
             Console.WriteLine("  0 1 2 3 4 5 6 7 8 9 "); //rubriker till kolumnerna
@@ -227,6 +246,28 @@ namespace BattleshipGame
                     Console.Write(grid[row, col] + " ");
                 }
                 Console.WriteLine();//tom rad
+            }
+        }
+
+        // Metod för att skriva ut datorns spelplan, utan att avslöja skeppen
+        static void PrintComputerGrid(char[,] grid)
+        {
+            Console.WriteLine("  0 1 2 3 4 5 6 7 8 9 "); // rubriker till kolumnerna
+            for (int row = 0; row < 10; row++)
+            {
+                Console.Write(row + " "); // radnumrering
+                for (int col = 0; col < 10; col++)
+                {
+                    if (grid[row, col] == 'S') // Om det är ett skepp, visa bara vatten
+                    {
+                        Console.Write("~ ");
+                    }
+                    else
+                    {
+                        Console.Write(grid[row, col] + " "); // Visa träff, miss eller vatten
+                    }
+                }
+                Console.WriteLine();// tom rad
             }
         }
 
