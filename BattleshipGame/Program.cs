@@ -1,27 +1,29 @@
 ﻿/*Anne-Lii Hansen
 Spelet "Sänka skepp" eller "Battleship" med C#.NET */
 
+//importerar nödvändiga bibliotek
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic;// Tillägg för att hantera listor
 using System.Diagnostics;  // Tillägg för Stopwatch
 
 namespace BattleshipGame
 {
     class Program
     {
-
+        //En lista för att lagra datorns mål(angränsande rutor till träffarna)
         static List<(int, int)> targetQueue = new List<(int, int)>();
 
         static void Main(string[] args)
         {
 
-            // Skapar en Stopwatch-instans
+            // Skapar en Stopwatch-instans för att mäta tiden
             Stopwatch stopwatch = new Stopwatch();
 
             //skapar ett 10x10 rutnät/spelplan var
             char[,] playerGrid = new char[10, 10];
             char[,] computerGrid = new char[10, 10];
 
+            //initierar spelplanerna med ~ symboler för vatten
             InitializeGrid(playerGrid);
             InitializeGrid(computerGrid);
 
@@ -64,11 +66,10 @@ namespace BattleshipGame
             stopwatch.Start();
             Console.WriteLine("Klockan har startats!\n");
 
-            //starta spelloopen
+            //variabel för att hålla koll på om spelet pågår eller ej
             bool gameOn = true;
 
-
-
+            //Spelloop tills spelet är slut
             while (gameOn)
             {
 
@@ -77,7 +78,7 @@ namespace BattleshipGame
                 PrintComputerGrid(computerGrid);
 
 
-                Console.WriteLine("Din tur att skjuta");
+                Console.WriteLine("\nDin tur att skjuta\n");
                 PlayerShoot(computerGrid, computerShips);
 
                 // Kolla om spelaren vann
@@ -90,7 +91,7 @@ namespace BattleshipGame
                     Console.WriteLine($"Spelet varade i {stopwatch.Elapsed.Minutes} minuter och {stopwatch.Elapsed.Seconds} sekunder.");
                     PrintComputerGrid(computerGrid);
                     gameOn = false;
-                    break;
+                    break;//avslutar spelet
                 }
 
                 // Visar datorns spelplan efter att spelaren har skjutit
@@ -117,7 +118,7 @@ namespace BattleshipGame
                     Console.WriteLine("Datorn sänkte alla dina skepp. Du förlorade.");
                     Console.WriteLine($"Spelet varade i {stopwatch.Elapsed.Minutes} minuter och {stopwatch.Elapsed.Seconds} sekunder.");
                     gameOn = false;
-                    break;
+                    break;//avslutar spelet
                 }
 
                 // Skriv ut spelarens spelplan efter varje tur
@@ -128,70 +129,79 @@ namespace BattleshipGame
             Console.WriteLine("Spelet är över. Tack för att du spelade!");
         }
 
+        // Datorns sjuklogik, väljer slumpmässigt rutor att skjuta på
         static void ComputerShoot(char[,] grid, Ship[] playerShips)
         {
             Random rnd = new Random();
-            int row, col;
+            int row = 0, col = 0;
             bool validShot = false;
 
-            // Försök att hitta en ruta som inte har blivit skjuten på
-            while (!validShot)
+            // Kontrollera om det finns mål i targetQueue att skjuta på
+            if (targetQueue.Count > 0)
             {
-                row = rnd.Next(0, 10);
-                col = rnd.Next(0, 10);
-
-                // Kolla om platsen redan är skjuten
-                if (grid[row, col] == 'x' || grid[row, col] == '/' || grid[row, col] == 'o')
+                (row, col) = targetQueue[0]; // Välj det första målet från kön
+                targetQueue.RemoveAt(0); // Ta bort målet från kön efter att ha skjutit
+                validShot = true; // Vi har redan valt en giltig ruta från targetQueue
+            }
+            else
+            {
+                // Om det inte finns några mål i kön, välj en slumpmässig ruta
+                while (!validShot)
                 {
-                    // Om platsen redan har blivit skjuten, fortsätt försöka
-                    continue;
-                }
+                    row = rnd.Next(0, 10);
+                    col = rnd.Next(0, 10);
 
-                // Om vi når hit, betyder det att platsen inte är skjuten på
-                validShot = true;
-
-                if (grid[row, col] == 'S') // Träffar skepp
-                {
-                    Console.WriteLine($"Datorn TRÄFFADE ett skepp på ({row}, {col})!");
-                    grid[row, col] = 'o'; // Markera träff med 'o'
-
-                    // Lägg till angränsande rutor för att skjuta på
-                    AddAdjacentTargets(row, col);
-
-                    // Kontrollera om skeppet som träffades har sjunkit
-                    foreach (var ship in playerShips)
+                    // Kolla om platsen redan är skjuten
+                    if (grid[row, col] == 'x' || grid[row, col] == '/' || grid[row, col] == 'o')
                     {
-                        if (ship.Positions.Contains((row, col)))
+                        continue; // Om platsen redan har blivit skjuten, fortsätt försöka
+                    }
+
+                    validShot = true; // Hittar en giltig ruta att skjuta på
+                }
+            }
+
+            if (grid[row, col] == 'S') // Träffar skepp
+            {
+                Console.WriteLine($"Datorn TRÄFFADE ett skepp på ({row}, {col})!");
+                grid[row, col] = 'o'; // Markera träff med 'o'
+
+                // Lägg till angränsande rutor för att skjuta på
+                AddAdjacentTargets(row, col);
+
+                // Kontrollera om skeppet som träffades har sjunkit
+                foreach (var ship in playerShips)
+                {
+                    if (ship.Positions.Contains((row, col)))
+                    {
+                        // Kontrollera om hela skeppet är sänkt
+                        if (ship.IsSunk(grid))
                         {
+                            Console.WriteLine($"Datorn har SÄNKT ditt skepp: {ship.Name}!");
 
-                            // Kontrollera om hela skeppet är sänkt
-                            if (ship.IsSunk(grid))
+                            // Ändra alla 'o' på detta skepp till 'x' för att visa att skeppet är sänkt
+                            foreach (var position in ship.Positions)
                             {
-                                Console.WriteLine($"Datorn har SÄNKT ditt skepp: {ship.Name}!");
+                                int shipRow = position.Item1;
+                                int shipCol = position.Item2;
 
-                                // Ändra alla 'o' på detta skepp till 'x' för att visa att skeppet är sänkt
-                                foreach (var position in ship.Positions)
+                                if (grid[shipRow, shipCol] == 'o') // Om det är en träff som ännu inte markerats som sänkt
                                 {
-                                    int shipRow = position.Item1;
-                                    int shipCol = position.Item2;
-
-                                    if (grid[shipRow, shipCol] == 'o') // Om det är en träff som ännu inte markerats som sänkt
-                                    {
-                                        grid[shipRow, shipCol] = 'x'; // Ändra till 'x'
-                                    }
+                                    grid[shipRow, shipCol] = 'x'; // Ändra till 'x'
                                 }
-                                break; // Avsluta loopen när skeppet har sänkts
                             }
+                            break; // Avsluta loopen när skeppet har sänkts
                         }
                     }
                 }
-                else
-                {
-                    Console.WriteLine($"Datorn MISSADE på ({row}, {col}).");
-                    grid[row, col] = '/'; // Markera miss
-                }
+            }
+            else
+            {
+                Console.WriteLine($"Datorn MISSADE på ({row}, {col}).");
+                grid[row, col] = '/'; // Markera miss
             }
         }
+        
 
 
         // Lägg till angränsande mål i targetQueue

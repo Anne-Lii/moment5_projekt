@@ -11,13 +11,14 @@ namespace BattleshipGame
         // Lista för att hålla reda på alla skeppspositioner
         public List<(int row, int col)> Positions { get; private set; } = new List<(int row, int col)>();
 
+         // Konstruktor för att skapa ett skepp med specifik längd och namn
         public Ship(int length, string name)
         {
             Length = length;
             Name = name;
         }
 
-        //Metod för att placera spelarens skepp
+        //Metod för att placera spelarens skepp på spelplanen
         public void PlaceShip(char[,] grid)
         {
 
@@ -27,14 +28,19 @@ namespace BattleshipGame
 
             Console.WriteLine($"Placera {Name} (längd: {Length})");
 
+            //loopar tills en giltid plats hittas
             while (!validPlacement)
+
             {
+                // Ber spelaren om rad och kolumn för att placera ut skeppen
                 row = GetValidCoordinate("rad", 0, 9);
                 col = GetValidCoordinate("kolumn", 0, 9);
                 direction = GetValidDirection();
 
+                //kontrollerar om skeppen kan placeras där
                 if (CanPlaceShip(grid, row, col, direction))
                 {
+                    //Placerar skeppen på spelplanen
                     PlaceShipOnGrid(grid, row, col, direction);
                     validPlacement = true;
 
@@ -55,14 +61,18 @@ namespace BattleshipGame
             char direction;
             bool validPlacement = false;
 
+            // Loopar tills giltig placering hittas
             while (!validPlacement)
             {
+                //skapar slumpmässiga koordinater samt riktning v eller h
                 row = rnd.Next(0, 10);
                 col = rnd.Next(0, 10);
                 direction = rnd.Next(0, 2) == 0 ? 'h' : 'v'; // Slumpmässig riktning
 
+                // Kontrollerar om skeppet kan placeras på utvald slumpmässig plats
                 if (CanPlaceShip(grid, row, col, direction))
                 {
+                    // Placerar skeppet på spelplanen
                     PlaceShipOnGrid(grid, row, col, direction);
                     validPlacement = true;
                 }
@@ -70,30 +80,31 @@ namespace BattleshipGame
         }
 
 
-        //kontrollera om skeppet får plats pga av andra placerade skepp
+        //metoden för att kontrollera om skeppet får plats pga av andra placerade skepp
         private bool CanPlaceShip(char[,] grid, int row, int col, char direction)
         {
             if (direction == 'h')
             {
-                if (col + Length > 9) return false;
+                if (col + Length > 9) return false; // om skeppet går utanför gränsen returnera false
 
                 for (int i = 0; i < Length; i++)
                 {
-                    if (grid[row, col + i] == 'S') return false;
+                    if (grid[row, col + i] == 'S') return false;// kontroll om en ruta redan är upptagen
                 }
             }
             else if (direction == 'v')
             {
-                if (row + Length > 9) return false;
+                if (row + Length > 9) return false;// om skeppet går utanför gränsen returnera false
 
                 for (int i = 0; i < Length; i++)
                 {
-                    if (grid[row + i, col] == 'S') return false;
+                    if (grid[row + i, col] == 'S') return false;// kontroll om en ruta redan är upptagen
                 }
             }
             return true;
         }
 
+        //Metod för att placera skeppet på spelplanen och spara positionen
         private void PlaceShipOnGrid(char[,] grid, int row, int col, char direction)
         {
             Positions.Clear(); // Rensa gamla positioner
@@ -116,6 +127,7 @@ namespace BattleshipGame
             }
         }
 
+        // Metod för att kontrollera om ett skepp har sjunkit
         public bool IsSunk(char[,] grid)
         {
 
@@ -138,7 +150,7 @@ namespace BattleshipGame
             return true; // Returnera att skeppet är sänkt
         }
 
-        // metod för inmatning av koordinater och riktning
+        // metod för att ta emot och validera inmatning av koordinater från spelaren
         public static int GetValidCoordinate(string prompt, int min, int max)
         {
             int coord;
@@ -148,7 +160,7 @@ namespace BattleshipGame
                 string? input = Console.ReadLine();
                 if (int.TryParse(input, out coord) && coord >= min && coord <= max)
                 {
-                    return coord;
+                    return coord; // returnera giltig koordinat
                 }
                 Console.WriteLine("Ogiltig inmatning. Försök igen.");
             }
@@ -163,13 +175,13 @@ namespace BattleshipGame
                 string? input = Console.ReadLine();
                 if (!string.IsNullOrEmpty(input) && (input == "h" || input == "v"))
                 {
-                    return char.Parse(input);
+                    return char.Parse(input);// Returnera giltig riktning
                 }
                 Console.WriteLine("Ogiltig inmatning. Försök igen.");
             }
         }
 
-        // Olika skepp
+        // klasser för de olika skeppen med namn och längd
         public class Destroyer : Ship
         {
             public Destroyer() : base(2, "Destroyer") { }
