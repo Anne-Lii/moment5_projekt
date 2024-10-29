@@ -67,12 +67,12 @@ namespace BattleshipGame
 
 
                 Console.WriteLine("Din tur att skjuta");
-                PlayerShoot(computerGrid);
+                PlayerShoot(computerGrid, computerShips);
 
                 // Kolla om spelaren vann
                 if (AllShipsSunk(computerGrid))
                 {
-                    Console.WriteLine("Grattis, du har sänkt alla skepp! Du vann!");
+                    Console.WriteLine("GRATTIS, du har sänkt alla skepp! Du vann!!!");
                     PrintComputerGrid(computerGrid);
                     gameOn = false;
                     break;
@@ -92,7 +92,6 @@ namespace BattleshipGame
                 // Datorn skjuter på spelarens spelplan
                 Console.WriteLine("\nDatorns tur att skjuta.");//debug
                 ComputerShoot(playerGrid, playerShips);
-                Console.WriteLine("\nDatorn har skjutit.");//debug
 
                 // Kolla om datorn vann
                 if (AllShipsSunk(playerGrid))
@@ -114,7 +113,7 @@ namespace BattleshipGame
         {
             Random rnd = new Random();
             int row, col;
-            bool validShot = false;//variabel för kontroll om rutan blivit skjuten tidigare
+            bool validShot = false;
 
             // Försök att hitta en ruta som inte har blivit skjuten på
             while (!validShot)
@@ -134,8 +133,8 @@ namespace BattleshipGame
 
                 if (grid[row, col] == 'S') // Träffar skepp
                 {
-                    Console.WriteLine($"Datorn träffade ett skepp på ({row}, {col})!");
-                    grid[row, col] = 'o'; // Markera träff med ett litet 'x'
+                    Console.WriteLine($"Datorn TRÄFFADE ett skepp på ({row}, {col})!");
+                    grid[row, col] = 'o'; // Markera träff med 'o'
 
                     // Lägg till angränsande rutor för att skjuta på
                     AddAdjacentTargets(row, col);
@@ -146,15 +145,12 @@ namespace BattleshipGame
                         if (ship.Positions.Contains((row, col)))
                         {
 
-                            // Debug-meddelande för att se om spelet kontrollerar om skeppet är sänkt
-                            Console.WriteLine($"Kontrollerar om {ship.Name} är sänkt...");
-
                             // Kontrollera om hela skeppet är sänkt
                             if (ship.IsSunk(grid))
                             {
-                                Console.WriteLine($"Datorn har sänkt ditt skepp: {ship.Name}!");
+                                Console.WriteLine($"Datorn har SÄNKT ditt skepp: {ship.Name}!");
 
-                                // Ändra alla 'x' på detta skepp till 'X' för att visa att skeppet är sänkt
+                                // Ändra alla 'o' på detta skepp till 'x' för att visa att skeppet är sänkt
                                 foreach (var position in ship.Positions)
                                 {
                                     int shipRow = position.Item1;
@@ -162,7 +158,7 @@ namespace BattleshipGame
 
                                     if (grid[shipRow, shipCol] == 'o') // Om det är en träff som ännu inte markerats som sänkt
                                     {
-                                        grid[shipRow, shipCol] = 'X'; // Ändra till stort 'X'
+                                        grid[shipRow, shipCol] = 'x'; // Ändra till 'x'
                                     }
                                 }
                                 break; // Avsluta loopen när skeppet har sänkts
@@ -172,11 +168,12 @@ namespace BattleshipGame
                 }
                 else
                 {
-                    Console.WriteLine($"Datorn missade på ({row}, {col}).");
+                    Console.WriteLine($"Datorn MISSADE på ({row}, {col}).");
                     grid[row, col] = '/'; // Markera miss
                 }
             }
         }
+
 
         // Lägg till angränsande mål i targetQueue
         static void AddAdjacentTargets(int row, int col)
@@ -188,7 +185,7 @@ namespace BattleshipGame
         }
 
         // Metod för Spelarens skjutlogik
-        static void PlayerShoot(char[,] grid)
+        static void PlayerShoot(char[,] grid, Ship[] computerShips)
         {
             Console.WriteLine("Ange rad (0-9) eller 'q' för att avsluta spelet:");
             string? input = Console.ReadLine();
@@ -212,6 +209,19 @@ namespace BattleshipGame
                     {
                         Console.WriteLine("Du TRÄFFADE ett skepp!");
                         grid[row, col] = 'o'; // Markera träff
+
+                        // Kontrollera om skeppet som träffades har sänkts
+                        foreach (var ship in computerShips)
+                        {
+                            if (ship.Positions.Contains((row, col)))
+                            {
+                                if (ship.IsSunk(grid))
+                                {
+                                    Console.WriteLine($"{ship.Name} har sänkts!");
+                                }
+                                break;
+                            }
+                        }
                     }
                     else
                     {
@@ -229,6 +239,7 @@ namespace BattleshipGame
                 Console.WriteLine("Ogiltig rad. Försök igen.");
             }
         }
+
 
         // Kollar om alla skepp är sänkta
         static bool AllShipsSunk(char[,] grid)

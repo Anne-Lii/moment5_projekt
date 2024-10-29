@@ -8,7 +8,7 @@ namespace BattleshipGame
         public int Length { get; private set; }
         public string Name { get; private set; }
 
-         // Lista för att hålla reda på alla skeppspositioner
+        // Lista för att hålla reda på alla skeppspositioner
         public List<(int row, int col)> Positions { get; private set; } = new List<(int row, int col)>();
 
         public Ship(int length, string name)
@@ -70,7 +70,7 @@ namespace BattleshipGame
         }
 
 
-        //kontrollera om skeppet får plats
+        //kontrollera om skeppet får plats pga av andra placerade skepp
         private bool CanPlaceShip(char[,] grid, int row, int col, char direction)
         {
             if (direction == 'h')
@@ -116,20 +116,29 @@ namespace BattleshipGame
             }
         }
 
-        // Kontrollera om skeppet har sjunkit
         public bool IsSunk(char[,] grid)
         {
+
+            // Kontrollera om alla delar av skeppet är träffade (markeras med 'o')
             foreach (var (row, col) in Positions)
             {
-                if (grid[row, col] != 'x' && grid[row, col] != 'o') // Om någon ruta fortfarande inte är träffad
+
+                if (grid[row, col] != 'o') // Om en del inte är träffad, returnera falskt
                 {
                     return false;
                 }
             }
-            return true; // Alla rutor har blivit träffade
+
+            // Om alla delar är träffade, ändra alla 'o' till 'X' för att signalera att skeppet är sänkt
+            foreach (var (row, col) in Positions)
+            {
+                grid[row, col] = 'X'; // Ändra alla träffar till 'X'
+            }
+
+            return true; // Returnera att skeppet är sänkt
         }
 
-        // Hjälpmetoder för inmatning av koordinater och riktning
+        // metod för inmatning av koordinater och riktning
         public static int GetValidCoordinate(string prompt, int min, int max)
         {
             int coord;
@@ -145,6 +154,7 @@ namespace BattleshipGame
             }
         }
 
+        //metod för att välja riktning på placering av skepp
         private char GetValidDirection()
         {
             while (true)
