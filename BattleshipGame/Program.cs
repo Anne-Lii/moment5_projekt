@@ -123,7 +123,7 @@ namespace BattleshipGame
                 col = rnd.Next(0, 10);
 
                 // Kolla om platsen redan är skjuten
-                if (grid[row, col] == 'X' || grid[row, col] == 'O' || grid[row, col] == 'x')
+                if (grid[row, col] == 'x' || grid[row, col] == '/' || grid[row, col] == 'o')
                 {
                     // Om platsen redan har blivit skjuten, fortsätt försöka
                     continue;
@@ -135,7 +135,7 @@ namespace BattleshipGame
                 if (grid[row, col] == 'S') // Träffar skepp
                 {
                     Console.WriteLine($"Datorn träffade ett skepp på ({row}, {col})!");
-                    grid[row, col] = 'x'; // Markera träff med ett litet 'x'
+                    grid[row, col] = 'o'; // Markera träff med ett litet 'x'
 
                     // Lägg till angränsande rutor för att skjuta på
                     AddAdjacentTargets(row, col);
@@ -143,29 +143,37 @@ namespace BattleshipGame
                     // Kontrollera om skeppet som träffades har sjunkit
                     foreach (var ship in playerShips)
                     {
-                        if (ship.Positions.Contains((row, col)) && ship.IsSunk(grid))
+                        if (ship.Positions.Contains((row, col)))
                         {
-                            Console.WriteLine($"Datorn har sänkt ditt skepp: {ship.Name}!");
 
-                            // Ändra alla 'x' på detta skepp till 'X' för att visa att skeppet är sänkt
-                            foreach (var position in ship.Positions)
+                            // Debug-meddelande för att se om spelet kontrollerar om skeppet är sänkt
+                            Console.WriteLine($"Kontrollerar om {ship.Name} är sänkt...");
+
+                            // Kontrollera om hela skeppet är sänkt
+                            if (ship.IsSunk(grid))
                             {
-                                int shipRow = position.Item1;
-                                int shipCol = position.Item2;
+                                Console.WriteLine($"Datorn har sänkt ditt skepp: {ship.Name}!");
 
-                                if (grid[shipRow, shipCol] == 'x') // Om det är en träff som ännu inte markerats som sänkt
+                                // Ändra alla 'x' på detta skepp till 'X' för att visa att skeppet är sänkt
+                                foreach (var position in ship.Positions)
                                 {
-                                    grid[shipRow, shipCol] = 'X'; // Ändra till stort 'X'
+                                    int shipRow = position.Item1;
+                                    int shipCol = position.Item2;
+
+                                    if (grid[shipRow, shipCol] == 'o') // Om det är en träff som ännu inte markerats som sänkt
+                                    {
+                                        grid[shipRow, shipCol] = 'X'; // Ändra till stort 'X'
+                                    }
                                 }
+                                break; // Avsluta loopen när skeppet har sänkts
                             }
-                            break;
                         }
                     }
                 }
                 else
                 {
                     Console.WriteLine($"Datorn missade på ({row}, {col}).");
-                    grid[row, col] = 'O'; // Markera miss
+                    grid[row, col] = '/'; // Markera miss
                 }
             }
         }
@@ -203,12 +211,12 @@ namespace BattleshipGame
                     if (grid[row, col] == 'S')
                     {
                         Console.WriteLine("Du TRÄFFADE ett skepp!");
-                        grid[row, col] = 'X'; // Markera träff
+                        grid[row, col] = 'o'; // Markera träff
                     }
                     else
                     {
                         Console.WriteLine("Du MISSADE.");
-                        grid[row, col] = 'O'; // Markera miss
+                        grid[row, col] = '/'; // Markera miss
                     }
                 }
                 else

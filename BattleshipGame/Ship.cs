@@ -121,7 +121,7 @@ namespace BattleshipGame
         {
             foreach (var (row, col) in Positions)
             {
-                if (grid[row, col] != 'X') // Om någon ruta fortfarande inte är träffad
+                if (grid[row, col] != 'x' && grid[row, col] != 'o') // Om någon ruta fortfarande inte är träffad
                 {
                     return false;
                 }
