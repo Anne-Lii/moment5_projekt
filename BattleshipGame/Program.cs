@@ -73,6 +73,7 @@ namespace BattleshipGame
                 if (AllShipsSunk(computerGrid))
                 {
                     Console.WriteLine("Grattis, du har sänkt alla skepp! Du vann!");
+                    PrintComputerGrid(computerGrid);
                     gameOn = false;
                     break;
                 }
