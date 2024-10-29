@@ -129,7 +129,7 @@ namespace BattleshipGame
             Console.WriteLine("Spelet är över. Tack för att du spelade!");
         }
 
-        // Datorns sjuklogik, väljer slumpmässigt rutor att skjuta på
+        // metod för datorns sjuklogik, väljer slumpmässigt rutor att skjuta på
         static void ComputerShoot(char[,] grid, Ship[] playerShips)
         {
             Random rnd = new Random();
@@ -201,10 +201,108 @@ namespace BattleshipGame
                 grid[row, col] = '/'; // Markera miss
             }
         }
-        
 
 
-        // Lägg till angränsande mål i targetQueue
+
+
+
+// Metod för Spelarens skjutlogik med detaljerade debug-loggar
+static void PlayerShoot(char[,] grid, Ship[] computerShips)
+{
+    bool validShot = false;
+
+    while (!validShot)
+    {
+        Console.WriteLine("Ange rad (0-9) eller 'q' för att avsluta spelet:");
+        string? input = Console.ReadLine();
+
+        // Om spelaren skriver "q", avsluta spelet
+        if (input?.ToLower() == "q")
+        {
+            Console.WriteLine("Du har valt att avsluta spelet.");
+            Environment.Exit(0); // Avslutar programmet direkt
+        }
+
+        // Fortsätt med att fråga efter rad om spelaren inte vill avsluta
+        if (int.TryParse(input, out int row) && row >= 0 && row <= 9)
+        {
+            Console.WriteLine("Ange kolumn (0-9):");
+            input = Console.ReadLine();
+
+            if (int.TryParse(input, out int col) && col >= 0 && col <= 9)
+            {
+                // Kontrollera om spelaren redan skjutit på denna ruta
+                if (grid[row, col] == 'o' || grid[row, col] == '/' || grid[row, col] == 'x')
+                {
+                    Console.WriteLine($"DEBUG: Försöker skjuta på redan markerad ruta grid[{row}, {col}] = {grid[row, col]}");
+                    Console.WriteLine("Du har redan skjutit på denna ruta. Välj en annan.");
+                    return;  // Hoppa tillbaka till början av loopen och be om ny inmatning
+                }
+
+                validShot = true; // Rutan är tillgänglig för att skjuta
+                Console.WriteLine($"DEBUG: Skjuter på grid[{row}, {col}], innehåll: {grid[row, col]}");
+
+                // Om spelaren träffar ett skepp
+                if (grid[row, col] == 'S')
+                {
+                    Console.WriteLine("Du TRÄFFADE ett skepp!");
+                    grid[row, col] = 'o'; // Markera träff
+                    Console.WriteLine($"DEBUG: Markera träff på grid[{row}, {col}] med 'o'");
+
+                    // Kontrollera om skeppet som träffades har sänkts
+                    foreach (var ship in computerShips)
+                    {
+                        if (ship.Positions.Contains((row, col)))
+                        {
+                            if (ship.IsSunk(grid))
+                            {
+                                Console.WriteLine($"{ship.Name} har sänkts!");
+                                Console.WriteLine($"DEBUG: {ship.Name} har sänkts. Markera hela skeppet med 'x'.");
+
+                                // Ändra alla 'o' till 'x' för detta skepp
+                                foreach (var position in ship.Positions)
+                                {
+                                    int shipRow = position.Item1;
+                                    int shipCol = position.Item2;
+
+                                    if (grid[shipRow, shipCol] == 'o') // Om det är en träff som ännu inte markerats som sänkt
+                                    {
+                                        grid[shipRow, shipCol] = 'x'; // Ändra till 'x' för att visa att skeppet är sänkt
+                                        Console.WriteLine($"DEBUG: Markera grid[{shipRow}, {shipCol}] med 'x'");
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // Om spelaren missar
+                    Console.WriteLine("Du MISSADE.");
+                    grid[row, col] = '/'; // Markera miss
+                    Console.WriteLine($"DEBUG: Markera miss på grid[{row}, {col}] med '/'");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Ogiltig kolumn. Försök igen.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Ogiltig rad. Försök igen.");
+        }
+    }
+}
+
+
+
+
+
+
+
+        // metod för att lägga till angränsande mål i targetQueue
         static void AddAdjacentTargets(int row, int col)
         {
             if (row > 0) targetQueue.Add((row - 1, col)); // Upp
@@ -213,66 +311,7 @@ namespace BattleshipGame
             if (col < 9) targetQueue.Add((row, col + 1)); // Höger
         }
 
-        // Metod för Spelarens skjutlogik
-        static void PlayerShoot(char[,] grid, Ship[] computerShips)
-        {
-            Console.WriteLine("Ange rad (0-9) eller 'q' för att avsluta spelet:");
-            string? input = Console.ReadLine();
-
-            // Om spelaren skriver "q", avsluta spelet
-            if (input?.ToLower() == "q")
-            {
-                Console.WriteLine("Du har valt att avsluta spelet.");
-                Environment.Exit(0); // Avslutar programmet direkt
-            }
-
-            // Fortsätt med att fråga efter rad om spelaren inte vill avsluta
-            if (int.TryParse(input, out int row) && row >= 0 && row <= 9)
-            {
-                Console.WriteLine("Ange kolumn (0-9):");
-                input = Console.ReadLine();
-
-                if (int.TryParse(input, out int col) && col >= 0 && col <= 9)
-                {
-
-                    Console.Clear();//rensar konsollen
-                    if (grid[row, col] == 'S')
-                    {
-                        Console.WriteLine("Du TRÄFFADE ett skepp!");
-                        grid[row, col] = 'o'; // Markera träff
-
-                        // Kontrollera om skeppet som träffades har sänkts
-                        foreach (var ship in computerShips)
-                        {
-                            if (ship.Positions.Contains((row, col)))
-                            {
-                                if (ship.IsSunk(grid))
-                                {
-                                    Console.WriteLine($"{ship.Name} har sänkts!");
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Du MISSADE.");
-                        grid[row, col] = '/'; // Markera miss
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Ogiltig kolumn. Försök igen.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Ogiltig rad. Försök igen.");
-            }
-        }
-
-
-        // Kollar om alla skepp är sänkta
+        // metod som kollar om alla skepp är sänkta
         static bool AllShipsSunk(char[,] grid)
         {
             foreach (char cell in grid)
