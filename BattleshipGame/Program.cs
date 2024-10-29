@@ -29,8 +29,6 @@ namespace BattleshipGame
                 new Ship.Destroyer()
             };
 
-            Console.WriteLine("Datorn placerar sina skepp...");
-
             foreach (var ship in computerShips)
             {
                 ship.PlaceShipRandom(computerGrid); // Placeras random av datorn, spelaren ser inte detta
@@ -81,8 +79,9 @@ namespace BattleshipGame
                 Console.Clear();
 
                 // Datorn skjuter på spelarens grid
-                Console.WriteLine("\nDatorns tur...");
+                Console.WriteLine("\nDatorns tur att skjuta.");//debug
                 ComputerShoot(playerGrid);
+                Console.WriteLine("\nDatorn har skjutit.");//debug
 
                 // Kolla om datorn vann
                 if (AllShipsSunk(playerGrid))
@@ -100,39 +99,45 @@ namespace BattleshipGame
             Console.WriteLine("Spelet är över. Tack för att du spelade!");
         }
 
-        // Datorns skjutlogik
-        static void ComputerShoot(char[,] grid)
+    static void ComputerShoot(char[,] grid)
+{
+    Random rnd = new Random();
+    int row, col;
+    bool validShot = false;//variabel för kontroll om rutan blivit skjuten tidigare
+
+    // Försök att hitta en ruta som inte har blivit skjuten på
+    while (!validShot)
+    {
+        row = rnd.Next(0, 10);
+        col = rnd.Next(0, 10);
+
+        // Kolla om platsen redan är skjuten
+        if (grid[row, col] == 'X' || grid[row, col] == 'O')
         {
-            Random rnd = new Random();
-            int row, col;
-
-            // Om det finns mål i kön, använd dem först
-            if (targetQueue.Count > 0)
-            {
-                (row, col) = targetQueue[0];
-                targetQueue.RemoveAt(0);
-            }
-            else
-            {
-                row = rnd.Next(0, 10);
-                col = rnd.Next(0, 10);
-            }
-
-            if (grid[row, col] == '~') // Om det är vatten
-            {
-                if (grid[row, col] == 'S') // Träffar skepp
-                {
-                    Console.WriteLine($"Datorn träffade ett skepp på ({row}, {col})!");
-                    grid[row, col] = 'X'; // Markera träff
-                    AddAdjacentTargets(row, col); // Lägg till angränsande mål i kön
-                }
-                else
-                {
-                    Console.WriteLine($"Datorn missade på ({row}, {col}).");
-                    grid[row, col] = 'O'; // Markera miss
-                }
-            }
+            // Om platsen redan har blivit skjuten, fortsätt försöka
+            continue;
         }
+
+        // Om vi når hit, betyder det att platsen inte är skjuten på
+        validShot = true;
+
+        // Debug: Visa vilken rad och kolumn datorn försöker skjuta på
+        Console.WriteLine($"Datorn skjuter på rad {row} och kolumn {col}...");
+
+        // Hantera träff eller miss
+        if (grid[row, col] == 'S') // Träffar skepp
+        {
+            Console.WriteLine($"Datorn träffade ett skepp på ({row}, {col})!");
+            grid[row, col] = 'X'; // Markera träff
+            AddAdjacentTargets(row, col); // Lägg till angränsande mål i kön
+        }
+        else
+        {
+            Console.WriteLine($"Datorn missade på ({row}, {col}).");
+            grid[row, col] = 'O'; // Markera miss
+        }
+    }
+}
 
         // Lägg till angränsande mål i targetQueue
         static void AddAdjacentTargets(int row, int col)
