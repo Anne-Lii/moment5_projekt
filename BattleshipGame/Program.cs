@@ -13,9 +13,9 @@ namespace BattleshipGame
 
         static void Main(string[] args)
         {
-            //skapar ett 10x10 rutnät
+            //skapar ett 10x10 rutnät var
             char[,] playerGrid = new char[10, 10];
-            char[,] computerGrid = new char[10, 10];        
+            char[,] computerGrid = new char[10, 10];
 
             InitializeGrid(playerGrid);//Anropar
             InitializeGrid(computerGrid);//Anropar
@@ -29,10 +29,14 @@ namespace BattleshipGame
                 new Ship.Destroyer()
             };
 
+            Console.WriteLine("Datorn placerar sina skepp...");
+
             foreach (var ship in computerShips)
             {
-                ship.PlaceShip(computerGrid); // Placeras av datorn, spelaren ser inte detta
+                ship.PlaceShipRandom(computerGrid); // Placeras random av datorn, spelaren ser inte detta
             }
+
+            Console.WriteLine("Datorn har placerat sina skepp.\n");
 
 
             // Skapa och placera spelarens skepp
@@ -43,18 +47,21 @@ namespace BattleshipGame
                 new Ship.Destroyer()
             };
 
+
             // Placera alla skepp
             foreach (var ship in playerShips)
             {
                 ship.PlaceShip(playerGrid);
             }
 
+            Console.WriteLine("Alla skepp har placerats. Spelet börjar!\n");
 
             //starta spelloopen
             bool gameOn = true;
 
             while (gameOn)
             {
+
                 Console.WriteLine("Din tur att skjuta");
                 PlayerShoot(computerGrid);
 
@@ -63,8 +70,15 @@ namespace BattleshipGame
                 {
                     Console.WriteLine("Grattis, du har sänkt alla skepp! Du vann!");
                     gameOn = false;
-                    continue;
+                    break;
                 }
+
+                // Paus för att låta spelaren se resultatet
+                Console.WriteLine("\nTryck på valfri tangent för att fortsätta...");
+                Console.ReadKey(); // Väntar på att spelaren trycker på en tangent
+
+                // Rensa konsollen innan datorns tur börjar
+                Console.Clear();
 
                 // Datorn skjuter på spelarens grid
                 Console.WriteLine("\nDatorns tur...");
@@ -75,12 +89,15 @@ namespace BattleshipGame
                 {
                     Console.WriteLine("Datorn sänkte alla dina skepp. Du förlorade.");
                     gameOn = false;
+                    break;
                 }
 
                 // Skriv ut spelarens grid efter varje tur
                 Console.WriteLine("\nDitt rutnät:");
                 PrintGrid(playerGrid);
             }
+
+            Console.WriteLine("Spelet är över. Tack för att du spelade!");
         }
 
         // Datorns skjutlogik
@@ -117,7 +134,7 @@ namespace BattleshipGame
             }
         }
 
-         // Lägg till angränsande mål i targetQueue
+        // Lägg till angränsande mål i targetQueue
         static void AddAdjacentTargets(int row, int col)
         {
             if (row > 0) targetQueue.Add((row - 1, col)); // Upp
@@ -129,18 +146,43 @@ namespace BattleshipGame
         // Metod för Spelarens skjutlogik
         static void PlayerShoot(char[,] grid)
         {
-            int row = Ship.GetValidCoordinate("rad", 0, 9);
-            int col = Ship.GetValidCoordinate("kolumn", 0, 9);
+            Console.WriteLine("Ange rad (0-9) eller 'q' för att avsluta spelet:");
+            string? input = Console.ReadLine();
 
-            if (grid[row, col] == 'S')
+            // Om spelaren skriver "q", avsluta spelet
+            if (input?.ToLower() == "q")
             {
-                Console.WriteLine("Du träffade ett skepp!");
-                grid[row, col] = 'X'; // Markera träff
+                Console.WriteLine("Du har valt att avsluta spelet.");
+                Environment.Exit(0); // Avslutar programmet direkt
+            }
+
+            // Fortsätt med att fråga efter rad om spelaren inte vill avsluta
+            if (int.TryParse(input, out int row) && row >= 0 && row <= 9)
+            {
+                Console.WriteLine("Ange kolumn (0-9):");
+                input = Console.ReadLine();
+
+                if (int.TryParse(input, out int col) && col >= 0 && col <= 9)
+                {
+                    if (grid[row, col] == 'S')
+                    {
+                        Console.WriteLine("Du träffade ett skepp!");
+                        grid[row, col] = 'X'; // Markera träff
+                    }
+                    else
+                    {
+                        Console.WriteLine("Du missade.");
+                        grid[row, col] = 'O'; // Markera miss
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Ogiltig kolumn. Försök igen.");
+                }
             }
             else
             {
-                Console.WriteLine("Du missade.");
-                grid[row, col] = 'O'; // Markera miss
+                Console.WriteLine("Ogiltig rad. Försök igen.");
             }
         }
 

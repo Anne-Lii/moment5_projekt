@@ -13,7 +13,7 @@ namespace BattleshipGame
             Name = name;
         }
 
-        //Metod för att placera skepp
+        //Metod för att placera spelarens skepp
         public void PlaceShip(char[,] grid)
         {
 
@@ -33,6 +33,8 @@ namespace BattleshipGame
                 {
                     PlaceShipOnGrid(grid, row, col, direction);
                     validPlacement = true;
+
+                    Console.Clear();//Rensar konsollen
                 }
                 else
                 {
@@ -40,6 +42,30 @@ namespace BattleshipGame
                 }
             }
         }
+
+        //Metod för att slumpmässigt placera datorns skepp
+        public void PlaceShipRandom(char[,] grid)
+        {
+            Random rnd = new Random();
+            int row, col;
+            char direction;
+            bool validPlacement = false;
+
+            while (!validPlacement)
+            {
+                row = rnd.Next(0, 10);
+                col = rnd.Next(0, 10);
+                direction = rnd.Next(0, 2) == 0 ? 'h' : 'v'; // Slumpmässig riktning
+
+                if (CanPlaceShip(grid, row, col, direction))
+                {
+                    PlaceShipOnGrid(grid, row, col, direction);
+                    validPlacement = true;
+                }
+            }
+        }
+
+
         //kontrollera om skeppet får plats
         private bool CanPlaceShip(char[,] grid, int row, int col, char direction)
         {
