@@ -1,5 +1,9 @@
+
+/*Anne-Lii Hansen
+Spelet "Sänka skepp" eller "Battleship" med C#.NET */
+
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic;//för att kunna använda list
 
 namespace BattleshipGame
 {
@@ -11,7 +15,7 @@ namespace BattleshipGame
         // Lista för att hålla reda på alla skeppspositioner
         public List<(int row, int col)> Positions { get; private set; } = new List<(int row, int col)>();
 
-         // Konstruktor för att skapa ett skepp med specifik längd och namn
+        // Konstruktor för att skapa ett skepp med specifik längd och namn
         public Ship(int length, string name)
         {
             Length = length;
@@ -26,6 +30,7 @@ namespace BattleshipGame
             char direction;
             bool validPlacement = false;
 
+            Console.Clear();//rensar konsollen
             Console.WriteLine($"Placera {Name} (längd: {Length})");
 
             //loopar tills en giltid plats hittas
@@ -153,11 +158,15 @@ namespace BattleshipGame
         // metod för att ta emot och validera inmatning av koordinater från spelaren
         public static int GetValidCoordinate(string prompt, int min, int max)
         {
-            int coord;
+            int coord;//variabel för att lagra giltig koordinat
+
+            //loop tills spelaren angett giltig koordinat
             while (true)
             {
                 Console.WriteLine($"Ange {prompt} ({min}-{max}):");
-                string? input = Console.ReadLine();
+                string? input = Console.ReadLine();//gör om input till en sträng
+
+                //gör om input till heltal och kontrollerar om det är inom tillåtet intervall
                 if (int.TryParse(input, out coord) && coord >= min && coord <= max)
                 {
                     return coord; // returnera giltig koordinat
@@ -175,8 +184,9 @@ namespace BattleshipGame
                 string? input = Console.ReadLine();
                 if (!string.IsNullOrEmpty(input) && (input == "h" || input == "v"))
                 {
-                    return char.Parse(input);// Returnera giltig riktning
+                    return char.Parse(input);// Returnera giltig riktning om v eller h
                 }
+
                 Console.WriteLine("Ogiltig inmatning. Försök igen.");
             }
         }
