@@ -73,7 +73,9 @@ namespace BattleshipGame
                 if (AllShipsSunk(computerGrid))
                 {
                     Console.Clear();//rensar konsollen
+                    Console.ForegroundColor = ConsoleColor.Green;//ändrar texten till grön
                     EndGame("GRATTIS, du har sänkt alla skepp! Du vann!!!");
+                    Console.ResetColor();//reset färg till vit
                     PrintComputerGrid(computerGrid);//datorns spelplan
                     break;
                 }
@@ -81,7 +83,9 @@ namespace BattleshipGame
                 //avslutar spelet om datorn sänkt alla dina skepp
                 if (AllShipsSunk(playerGrid))
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;//ändrar texten till röd
                     EndGame("\nDatorn sänkte alla dina skepp. Du förlorade.");
+                    Console.ResetColor();//reset färg till vit
                     break;
                 }
 
@@ -200,12 +204,12 @@ namespace BattleshipGame
                     validShot = int.TryParse(input, out int col) && col >= 0 && col <= 9;
                     if (validShot)
                     {
-                        Console.WriteLine($"DEBUG: Skjuter på grid[{row}, {col}] = {grid[row, col]}"); // Kontroll av aktuellt innehåll
-
                         // Kontrollera om spelaren redan skjutit på denna ruta
                         if (grid[row, col] == 'o' || grid[row, col] == '/' || grid[row, col] == 'x' || grid[row, col] == 'X')
                         {
+                            Console.ForegroundColor = ConsoleColor.Yellow;//ändrar texten till gul
                             Console.WriteLine("Du har redan skjutit på denna ruta. Välj en annan.");
+                            Console.ResetColor();//reset färg till vit
                             validShot = false; // Sätter till false för att stanna i loopen och få nya koordinater
                         }
                         else
@@ -216,7 +220,9 @@ namespace BattleshipGame
                             // Om spelaren träffar ett skepp
                             if (grid[row, col] == 'S')
                             {
+                                Console.ForegroundColor = ConsoleColor.Green;//ändrar texten till grön
                                 Console.WriteLine($"\nDU TRÄFFADE ETT SKEPP PÅ RAD: {row}, KOLUMN: {col}");
+                                Console.ResetColor();//reset färg till vit
                                 grid[row, col] = 'o'; // Markera träff
 
                                 // Kontrollera om skeppet som träffades har sänkts
@@ -224,7 +230,10 @@ namespace BattleshipGame
                                 {
                                     if (ship.Positions.Contains((row, col)) && ship.IsSunk(grid))
                                     {
+                                        Console.ForegroundColor = ConsoleColor.Green;//ändrar texten till grön
                                         Console.WriteLine($"{ship.Name} har sänkts!");
+                                        Console.ResetColor();//reset färg till vit
+
                                         // Ändra alla 'o' till 'x' för detta skepp
                                         foreach (var position in ship.Positions)
                                         {
@@ -242,20 +251,27 @@ namespace BattleshipGame
                             }
                             else
                             {
+
                                 // Om spelaren missar
+                                Console.ForegroundColor = ConsoleColor.Red;//ändrar texten till röd
                                 Console.WriteLine($"\nDU MISSADE PÅ RAD: {row}, KOLUMN: {col}");
+                                Console.ResetColor();//reset färg till vit
                                 grid[row, col] = '/'; // Markera miss
                             }
                         }
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Yellow;//ändrar texten till gul
                         Console.WriteLine("Ogiltig kolumn. Försök igen.");
+                        Console.ResetColor();//reset färg till vit
                     }
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Yellow;//ändrar texten till gul
                     Console.WriteLine("Ogiltig rad. Försök igen.");
+                    Console.ResetColor();//reset färg till vit
                 }
 
             } while (!validShot); // Fortsätter tills spelaren gör ett giltigt skott
@@ -294,10 +310,15 @@ namespace BattleshipGame
         //Metod för att skriva ut spelplanen till konsollen
         private void PrintGrid(char[,] grid)
         {
+            Console.ForegroundColor = ConsoleColor.Blue;//ändrar texten till blå
             Console.WriteLine("  0 1 2 3 4 5 6 7 8 9 "); //rubriker till kolumnerna
+            Console.ResetColor();//reset färg till vit
             for (int row = 0; row < 10; row++)
             {
+                Console.ForegroundColor = ConsoleColor.Blue;//ändrar texten till blå
                 Console.Write(row + " "); //radnumrering
+                Console.ResetColor();//reset färg till vit
+
                 for (int col = 0; col < 10; col++)
                 {
                     Console.Write(grid[row, col] + " ");
@@ -310,10 +331,15 @@ namespace BattleshipGame
         // Metod för att skriva ut datorns spelplan, utan att avslöja skeppen
         private void PrintComputerGrid(char[,] grid)
         {
+            Console.ForegroundColor = ConsoleColor.Magenta;//ändrar texten till magenta
             Console.WriteLine("  0 1 2 3 4 5 6 7 8 9 "); // rubriker till kolumnerna
+            Console.ResetColor();//reset färg till vit
             for (int row = 0; row < 10; row++)
             {
+                Console.ForegroundColor = ConsoleColor.Magenta;//ändrar texten till magenta
                 Console.Write(row + " "); // radnumrering
+                Console.ResetColor();//reset färg till vit
+
                 for (int col = 0; col < 10; col++)
                 {
                     if (grid[row, col] == 'S') // Om det är ett skepp, visa bara vatten
