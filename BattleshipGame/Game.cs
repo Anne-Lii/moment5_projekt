@@ -9,6 +9,7 @@ namespace BattleshipGame
 {
     public class Game
     {
+        
         private List<(int, int)> targetQueue = new List<(int, int)>(); //lista att lagra koordinater som datorn ska skjuta på efter en träff
         private Stopwatch stopwatch = new Stopwatch();//timer för tidtagning
         private char[,] playerGrid;//spelplan för spelaren
