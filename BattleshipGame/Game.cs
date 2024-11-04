@@ -35,7 +35,7 @@ namespace BattleshipGame
             //initierar spelplanerna med vatten
             InitializeGrid(playerGrid);
             InitializeGrid(computerGrid);
-            foreach (var ship in computerShips) ship.PlaceShipRandom(computerGrid);//placerar datorns skepp random
+            foreach (var ship in computerShips) ship.PlaceShipRandom(computerGrid);//placerar datorns skepp random 
             foreach (var ship in playerShips) ship.PlaceShip(playerGrid);//spelaren placerar sina egna skepp
         }
 
@@ -115,7 +115,7 @@ namespace BattleshipGame
             {
                 (row, col) = targetQueue[0]; // Välj det första målet från kön
                 targetQueue.RemoveAt(0); // Ta bort målet från kön efter att ha skjutit
-                validShot = true; // Vi har redan valt en giltig ruta från targetQueue
+                validShot = true; 
             }
             else
             {
